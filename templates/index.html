@@ -59,7 +59,8 @@
                     processData: false,
                     success: function(response) {
                         $('#loadingUpload').hide();
-                        $('#visualizations').html('<img src="data:image/png;base64,' + response.plot_url + '" alt="Visualization Plot"><img src="data:image/png;base64,' + response.plot_url2 + '" alt="Visualization Plot">');
+                        // $('#visualizations').html('<img src="data:image/png;base64,' + response.plot_url + '" alt="Visualization Plot"><img src="data:image/png;base64,' + response.plot_url2 + '" alt="Visualization Plot">');
+                        $('#visualizations').html('<img src="data:image/png;base64,' + response.plot_url + '" alt="Visualization Plot"><img src="data:image/png;base64,' + response.plot_url2 + '" alt="Visualization Plot"><img src="data:image/png;base64,' + response.plot_url3 + '" alt="Visualization Plot">');
                     },
                     error: function() {
                         $('#loadingUpload').hide();

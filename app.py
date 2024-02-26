@@ -11,7 +11,7 @@ from werkzeug.utils import secure_filename
 import os, pandas as pd
 from datetime import datetime
 # Assuming necessary import statements for your prediction and visualization functions are here
-
+import time  
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads/'
 app.config['ALLOWED_EXTENSIONS'] = {'csv'}
@@ -41,9 +41,9 @@ def upload_visualize():
     df = pd.read_csv(filepath,index_col=False)
     # Assuming get_df_vis, visualize_df_dis, and visualize_df_vib return base64 encoded images
     df_vis = get_df_vis(df, 5)
-    plot_url = visualize_df_dis(df_vis)
-    plot_url2 = visualize_df_vib(df_vis)
-    plot_url3 = visualize_df_ang(df_vis)
+    plot_url = visualize_df_dis(df_vis,4)
+    plot_url2 = visualize_df_vib(df_vis,4)
+    plot_url3 = visualize_df_ang(df_vis,4)
     return jsonify({
         'plot_url': plot_url,
         'plot_url2': plot_url2,
@@ -53,16 +53,20 @@ def upload_visualize():
 @app.route('/predict', methods=['POST'])
 def predict():
     filepath = session.get('last_uploaded_filepath')
+
     df = pd.read_csv(filepath, index_col=False)
+    start_time = time.time()
     processed_data = process_data(df)
-    prediction_result,shap_plot = predictX(processed_data)
+    end_time = time.time()
+    duration_process = end_time-start_time
+    prediction_result,shap_plot,duration,duration1 = predictX(processed_data)
 
     # Assuming the images are named with a number prefix and are stored in 'static' folder
     folder_path = os.path.join(os.getcwd(), "Failure Mode Images")
     files = os.listdir(folder_path)
     files.sort()  # Ensure files are sorted correctly, might need custom sorting for numeric prefixes
 
-    # Select the image based on prediction_result
+
     selected_image = None
     for file in files:
         if file.startswith(str(prediction_result) + " "):  # Match files starting with prediction_result
@@ -73,7 +77,7 @@ def predict():
         image_path = url_for('static', filename=selected_image)
         # Extract the descriptive text from the filename
 
-        descriptive_text = extract_description(selected_image) # Removes number prefix and file extension
+        descriptive_text = extract_description(selected_image)+" Process "+str(round(duration_process,3)) +"sec Predict: "+str(round(duration,3))+"sec Visualize:"+str(round(duration1,3))+"sec" # Removes number prefix and file extension
     else:
         image_path = ""
         descriptive_text = "No image found"
@@ -82,7 +86,8 @@ def predict():
         'prediction_result': prediction_result,
         'image_path': image_path,
         'descriptive_text': descriptive_text,
-        'shap_plot':url_for('static',filename=shap_plot)
+        'shap_plot':url_for('static',filename=shap_plot),
+        
     })
 if __name__ == '__main__':
     app.run(debug=True)

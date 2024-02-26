@@ -345,11 +345,18 @@ def get_df_vis(df_in,n):
         subset_df = df_filtered 
     return subset_df
 
-def visualize_df_vib(subset_df):
+def visualize_df_vib(subset_df,m):
     plt.figure(figsize=(8, 6))
-    plt.plot(subset_df['Time'], subset_df['X-axis vibration displacement(um)'], label='X-axis', linestyle='--',color='black')
-    plt.plot(subset_df['Time'], subset_df['Y-axis vibration displacement(um)'], label='Y-axis', linestyle='--',color='blue')
-    plt.plot(subset_df['Time'], subset_df['Z-axis vibration displacement(um)'], label='Z-axis', linestyle='-',color='red')
+    N = len(subset_df)
+    subset_df['TimeIndex'] = range(N)
+    time_min = subset_df['TimeIndex'].min()
+    time_max = subset_df['TimeIndex'].max()
+
+    # Apply transformation to scale 'Time' linearly between 0 and N
+    subset_df['Scaled_Time'] = ((subset_df['TimeIndex'] - time_min) / (time_max - time_min)) * (m+1)
+    plt.plot(subset_df['Scaled_Time'], subset_df['X-axis vibration displacement(um)'], label='X-axis', linestyle='--',color='black')
+    plt.plot(subset_df['Scaled_Time'], subset_df['Y-axis vibration displacement(um)'], label='Y-axis', linestyle='--',color='blue')
+    plt.plot(subset_df['Scaled_Time'], subset_df['Z-axis vibration displacement(um)'], label='Z-axis', linestyle='-',color='red')
 
     # Adding fancy elements
     plt.title('Vibration Displacement along X, Y, and Z axes', fontsize=16)
@@ -366,11 +373,19 @@ def visualize_df_vib(subset_df):
     img.seek(0)
     plot_url = base64.b64encode(img.getvalue()).decode()
     return plot_url
-def visualize_df_dis(df):
+def visualize_df_dis(df,m):
     plt.figure(figsize=(8, 6))
-    plt.plot(df['Time'],df['X-axis vibration speed(mm/s)'], label='X-axis', linestyle='--' ,color='black')
-    plt.plot(df['Time'],df['Y-axis vibration speed(mm/s)'], label='Y-axis', linestyle='--',color='blue')
-    plt.plot(df['Time'],df['Z-axis vibration speed(mm/s)'], label='Z-axis', linestyle='-',color='red')
+    # plt.figure(figsize=(8, 6))
+    N = len(df)
+    df['TimeIndex'] = range(N)
+    time_min = df['TimeIndex'].min()
+    time_max = df['TimeIndex'].max()
+
+    # Apply transformation to scale 'Time' linearly between 0 and N
+    df['Scaled_Time'] = ((df['TimeIndex'] - time_min) / (time_max - time_min)) * (m+1)
+    plt.plot(df['Scaled_Time'],df['X-axis vibration speed(mm/s)'], label='X-axis', linestyle='--' ,color='black')
+    plt.plot(df['Scaled_Time'],df['Y-axis vibration speed(mm/s)'], label='Y-axis', linestyle='--',color='blue')
+    plt.plot(df['Scaled_Time'],df['Z-axis vibration speed(mm/s)'], label='Z-axis', linestyle='-',color='red')
 
     # Adding fancy elements
     plt.title('Vibration Speeds along X, Y, and Z axes', fontsize=16)
@@ -388,14 +403,21 @@ def visualize_df_dis(df):
     plot_url = base64.b64encode(img.getvalue()).decode()
     return plot_url
 
-def visualize_df_ang(df):
+def visualize_df_ang(df,m):
     plt.figure(figsize=(8, 6))
-    plt.plot(df['X-axis angular vibration amplitude(°)'], label='X-axis', linestyle='--' ,color='black')
-    plt.plot(df['Y-axis angular vibration amplitude(°)'], label='Y-axis', linestyle='--',color='blue')
-    plt.plot(df['Z-axis angular vibration amplitude(°)'], label='Z-axis', linestyle='-',color='red')
+    N = len(df)
+    df['TimeIndex'] = range(N)
+    time_min = df['TimeIndex'].min()
+    time_max = df['TimeIndex'].max()
+
+    # Apply transformation to scale 'Time' linearly between 0 and N
+    df['Scaled_Time'] = ((df['TimeIndex'] - time_min) / (time_max - time_min)) * (m+1)
+    plt.plot(df['Scaled_Time'],df['X-axis angular vibration amplitude(°)'], label='X-axis', linestyle='--' ,color='black')
+    plt.plot(df['Scaled_Time'],df['Y-axis angular vibration amplitude(°)'], label='Y-axis', linestyle='--',color='blue')
+    plt.plot(df['Scaled_Time'],df['Z-axis angular vibration amplitude(°)'], label='Z-axis', linestyle='-',color='red')
 
     # Adding fancy elements
-    plt.title('Vibration Speeds along X, Y, and Z axes', fontsize=16)
+    plt.title('Vibration Angles along X, Y, and Z axes', fontsize=16)
     plt.xlabel('Measurement Number', fontsize=14)
     plt.ylabel('Vibration Angular (°)', fontsize=14)
     plt.legend(title='Axis', fontsize=12)
@@ -441,7 +463,7 @@ def extract_description(filename):
 import numpy as np
 import pandas as pd
 # Assuming load_model and other necessary imports are defined
-
+import time
 def predictX(data):
     SEED = 42
     np.random.seed(SEED)
@@ -487,19 +509,20 @@ def predictX(data):
         avg_predictions = np.mean(predictions, axis=0)
         final_predictions = np.argmax(avg_predictions, axis=1)
         return final_predictions, predictions
-
+    start_time = time.time()
     # Load your models here; example:
     models = load_model()
 
     X = data[input_vars]
     ensemble_predictions, all_predictions = ensemble_predict(models, X)
     prediction = find_most_frequent_element(ensemble_predictions)
-
-
+    end_time = time.time()  # Record the end time
+    duration = end_time - start_time
+    start_time1 = time.time()
     data_point_indices = np.where(ensemble_predictions.reshape(-1,1) == int(prediction))[0].tolist()
     # print("Check", ensemble_predictions[0], prediction)
     # print(ensemble_predictions[0]==prediction)
-    print(data_point_indices)
+    # print(data_point_indices)
     if len(data_point_indices) > 0:
         # Correctly select one of these data points at random for SHAP analysis
         data_point_index = 0
@@ -577,5 +600,7 @@ def predictX(data):
         
         return p
     plot_shap = get_shap_values_plot_path(selected_model,selected_data_point,prediction)
-    return prediction, plot_shap
+    end_time1 = time.time()  # Record the end time
+    duration1 = end_time1 - start_time1
+    return prediction, plot_shap,duration, duration1
 
