@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CSV Prediction and Visualization</title>
+    <style>
+        #container { display: flex; }
+        #left, #right { width: 50%; } /* Ensure both sides take up half the space */
+        #header { text-align: center; margin-bottom: 20px; }
+        img.logo { width: 400px; height: 100px; }
+        #loading { display: none; } /* Initially hide the loading GIF */
+        .plot { margin-top: 20px; } /* Style for plot images */
+    </style>
+</head>
+<body>
+    <div id="header">
+        <img class="logo" src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
+    </div>
+    <div id="container">
+        <div id="left">
+            <form id="uploadForm" enctype="multipart/form-data">
+                <input type="file" name="file" required>
+                <button type="submit">Upload</button>
+            </form>
+            <div id="loading">
+                <img src="{{ url_for('static', filename='loading.gif') }}" alt="Loading...">
+            </div>
+            <!-- Visualization plots will be inserted here after processing -->
+            <div id="plot1" class="plot"></div>
+            <div id="plot2" class="plot"></div>
+        </div>
+        <div id="right">
+            <h2>Prediction Result</h2>
+            <!-- Prediction results will be shown here -->
+            <p id="predictionResult"></p>
+        </div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#uploadForm').on('submit', function(e) {
+                e.preventDefault();
+                $('#loading').show();
+
+                var formData = new FormData(this);
+                $.ajax({
+                    url: '/upload',
+                    type: 'POST',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function(response) {
+                        $('#loading').hide();
+                        $('#plot1').html('<img src="data:image/png;base64,' + response.plot_url + '" alt="Visualization Plot">').show();
+                        $('#plot2').html('<img src="data:image/png;base64,' + response.plot_url2 + '" alt="Second Visualization Plot">').show();
+                        $('#predictionResult').text('Prediction: ' + response.prediction_result);
+                    },
+                    error: function() {
+                        $('#loading').hide();
+                        alert("Error processing file.");
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

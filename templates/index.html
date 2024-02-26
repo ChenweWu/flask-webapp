@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CSV Prediction and Visualization</title>
+    <style>
+        #container { display: flex; }
+        #left, #right { width: 50%; float: left; }
+        #header { text-align: center; margin-bottom: 20px; }
+        img.logo { width: 400px; height: 100px; }
+        #loading { display: none; }
+    </style>
+</head>
+<body>
+    <div id="header">
+        <img class="logo" src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
+    </div>
+    <div id="container">
+        <div id="left">
+            <h2>Upload and Visualize</h2>
+            <form id="uploadForm" enctype="multipart/form-data">
+                <input type="file" name="file" required>
+                <button type="submit">Upload and Visualize</button>
+            </form>
+            <div id="loadingUpload" style="display: none;">
+                <img src="{{ url_for('static', filename='loading.gif') }}" alt="Loading...">
+            </div>
+            <div id="visualizations">
+                <!-- Visualization plots will be inserted here -->
+            </div>
+        </div>
+        <div id="right">
+            <h2>Prediction</h2>
+            <button id="predictButton">Predict</button>
+            <div id="loadingPredict" style="display: none;">
+                <img src="{{ url_for('static', filename='loading.gif') }}" alt="Loading...">
+            </div>
+            <div id="predictionResult">
+                <!-- Prediction result will be shown here -->
+            </div>
+            {% if image_path %}
+            <img src="{{ image_path }}" alt="Prediction Image" style="width: 200px; height: 150px;">
+            {% endif %}
+            
+        </div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#uploadForm').on('submit', function(e) {
+                e.preventDefault();
+                $('#loadingUpload').show();
+                var formData = new FormData(this);
+                $.ajax({
+                    url: '/upload_visualize',
+                    type: 'POST',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function(response) {
+                        $('#loadingUpload').hide();
+                        $('#visualizations').html('<img src="data:image/png;base64,' + response.plot_url + '" alt="Visualization Plot"><img src="data:image/png;base64,' + response.plot_url2 + '" alt="Visualization Plot">');
+                    },
+                    error: function() {
+                        $('#loadingUpload').hide();
+                        alert("Error uploading and visualizing file.");
+                    }
+                });
+            });
+
+            $('#predictButton').on('click', function() {
+                $('#loadingPredict').show();
+                // Here, adjust how you send the prediction request (e.g., include filename if needed)
+                $.ajax({
+                    url: '/predict',
+                    type: 'POST',
+                    contentType: 'application/json', // Adjust based on your request payload
+                    success: function(response) {
+                        $('#loadingPredict').hide();
+                        $('#predictionResult').html('Prediction: ' + response.prediction_result + '<br><img src="' + response.image_path+ '" alt="Prediction Image" style="width: 900px;">' +'<br>' + response.descriptive_text + '<br><img src="' + response.shap_plot + '" alt="Prediction Image" style="width: 900px;">' +'<br>');
+
+                        // $('#predictionResult').text('Prediction: ' + response.prediction_result);
+                        // $('#predictionResult').html('Prediction: ' + response.prediction_result + '<br><img src="' + response.image_path + '" alt="Prediction Image"><br>' + response.descriptive_text);
+                        // $('#ErrorMode').html('<img src="data:image/png;base64,' + response.encoded_image + '" alt="Error Plot">');
+                        
+                    },
+                    error: function() {
+                        $('#loadingPredict').hide();
+                        alert("Error performing prediction.");
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

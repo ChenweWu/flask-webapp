@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CSV Prediction and Visualization</title>
+    <style>
+        #container {
+            display: flex;
+        }
+        #left, #right {
+            flex: 1;
+        }
+        #header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        img.logo {
+            width: 400px; /* You can adjust this as necessary */
+            height:  100px;
+        }
+        #loading { display: none; } /* Ensure loading is hidden by default */
+    </style>
+</head>
+<body>
+    <div id="header">
+        <img class="logo" src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
+    </div>
+    <div id="container">
+        <div id="left">
+            <h2>Upload CSV File</h2>
+            <form action="/" method="post" enctype="multipart/form-data">
+                <input type="file" name="file" required>
+                <input type="submit">
+            </form>
+            {% if plot_url %}
+            <h3>Visualizations</h3>
+            <figure>
+                <img src="data:image/png;base64,{{ plot_url }}" alt="Visualization Plot">
+                <!-- <figcaption>Caption for the first visualization plot.</figcaption> -->
+            </figure>
+            {% endif %}
+            {% if plot_url2 %}
+                <figure>
+                    <img src="data:image/png;base64,{{ plot_url2 }}" alt="Second Visualization Plot">
+                    <!-- <figcaption>Caption for the second visualization plot.</figcaption> -->
+                </figure>
+            {% endif %}
+        </div>
+        <div id="right">
+            <h2>Prediction Result</h2>
+            <div id="progressBarContainer" style="width: 100%; background-color: #ddd;">
+                <div id="progressBar" style="width: {{ progress }}%; height: 30px; background-color: #4CAF50;"></div>
+            </div>
+            
+ 
+            {% if prediction_result %}
+                <p>Prediction: {{ prediction_result }}</p>
+            {% endif %}
+            {% if image_path %}
+                <img src="{{ image_path }}" alt="Prediction Image">
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
+
+==============
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CSV Prediction and Visualization</title>
+    <style>
+        #container { display: flex; }
+        #left, #right { flex: 1; }
+        #header { text-align: center; margin-bottom: 20px; }
+        img.logo { width: 400px; height: 100px; }
+    </style>
+</head>
+<body>
+    <div id="header">
+        <img class="logo" src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
+    </div>
+    <div id="container">
+        <div id="left">
+            <h2>Upload CSV File</h2>
+            <form action="/" method="post" enctype="multipart/form-data">
+                <input type="file" name="file" required>
+                <input type="submit">
+            </form>
+            <!-- Loading GIF Conditionally Displayed -->
+            {% if not processed %}
+            <div id="loading">
+                <img src="{{ url_for('static', filename='loading.gif') }}" alt="Loading...">
+            </div>
+            {% endif %}
+            {% if processed %}
+                {% if plot_url %}
+                <h3>Visualizations</h3>
+                <figure>
+                    <img src="data:image/png;base64,{{ plot_url }}" alt="Visualization Plot">
+                </figure>
+                {% endif %}
+                {% if plot_url2 %}
+                    <figure>
+                        <img src="data:image/png;base64,{{ plot_url2 }}" alt="Second Visualization Plot">
+                    </figure>
+                {% endif %}
+            {% endif %}
+        </div>
+        <div id="right">
+            {% if processed %}
+                <h2>Prediction Result</h2>
+                {% if prediction_result %}
+                    <p>Prediction: {{ prediction_result }}</p>
+                {% endif %}
+                {% if image_path %}
+                    <img src="{{ image_path }}" alt="Prediction Image">
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
