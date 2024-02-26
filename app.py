@@ -43,7 +43,7 @@ def upload_visualize():
     df_vis = get_df_vis(df, 3)
     plot_url = visualize_df_dis(df_vis)
     plot_url2 = visualize_df_vib(df_vis)
-    
+
     return jsonify({
         'plot_url': plot_url,
         'plot_url2': plot_url2,
@@ -54,12 +54,12 @@ def upload_visualize():
 #     # Assuming the filename or data to predict on is passed as part of the request
 #     # Or use session or another mechanism to store/retrieve the filepath or data
 #     filepath = session.get('last_uploaded_filepath') # Example, adjust based on your implementation
-    
+
 #     # Perform prediction
 #     df = pd.read_csv(filepath,index_col=False)
 #     processed_data = process_data(df)
 #     prediction_result = predict_classes(processed_data)
-    
+
 #     # Example usage
 #     folder_path = "Failure Mode Images"
 #     start_number = prediction_result  # Example start number
@@ -78,18 +78,18 @@ def predict():
     folder_path = os.path.join(os.getcwd(), "Failure Mode Images")
     files = os.listdir(folder_path)
     files.sort()  # Ensure files are sorted correctly, might need custom sorting for numeric prefixes
-    
+
     # Select the image based on prediction_result
     selected_image = None
     for file in files:
         if file.startswith(str(prediction_result) + " "):  # Match files starting with prediction_result
             selected_image = file
             break
-    
+
     if selected_image:
         image_path = url_for('static', filename=selected_image)
         # Extract the descriptive text from the filename
-        
+
         descriptive_text = extract_description(selected_image) # Removes number prefix and file extension
     else:
         image_path = ""
@@ -102,4 +102,4 @@ def predict():
         'shap_plot':url_for('static',filename=shap_plot)
     })
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host="0:0:0:0", port =5000)

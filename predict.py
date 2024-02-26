@@ -12,36 +12,18 @@ import numpy as np
 import pandas as pd
 from datetime import datetime
 import scipy.stats
-import lightgbm as lgb
 import numpy as np
-import sklearn.datasets
 import sklearn.metrics
-import optuna
 import io
 import base64
 import re
 from scipy import stats
 # You can use Matplotlib instead of Plotly for viualization by simply replacing `optuna.visualization` with
 # `optuna.visualization.matplotlib` in the following examples.
-from optuna.visualization import plot_contour
-from optuna.visualization import plot_edf
-from optuna.visualization import plot_intermediate_values
-from optuna.visualization import plot_optimization_history
-from optuna.visualization import plot_parallel_coordinate
-from optuna.visualization import plot_param_importances
-from optuna.visualization import plot_rank
-from optuna.visualization import plot_slice
-from optuna.visualization import plot_timeline
+
 from PIL import Image
 from io import BytesIO
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score, f1_score
-from sklearn.model_selection import train_test_split, cross_val_score, StratifiedKFold, StratifiedKFold, cross_validate
-from sklearn.preprocessing import StandardScaler
-from sklearn.pipeline import Pipeline
-from sklearn.datasets import make_classification  # Example dataset
-import logging
-import sys
+
 
 import xgboost as xgb
 def process_data(file):
