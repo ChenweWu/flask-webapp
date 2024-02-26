@@ -40,33 +40,16 @@ def upload_visualize():
     # Process for visualization
     df = pd.read_csv(filepath,index_col=False)
     # Assuming get_df_vis, visualize_df_dis, and visualize_df_vib return base64 encoded images
-    df_vis = get_df_vis(df, 3)
+    df_vis = get_df_vis(df, 5)
     plot_url = visualize_df_dis(df_vis)
     plot_url2 = visualize_df_vib(df_vis)
-
+    plot_url3 = visualize_df_ang(df_vis)
     return jsonify({
         'plot_url': plot_url,
         'plot_url2': plot_url2,
+        'plot_url3':plot_url3
     })
 
-# @app.route('/predict', methods=['POST'])
-# def predict():
-#     # Assuming the filename or data to predict on is passed as part of the request
-#     # Or use session or another mechanism to store/retrieve the filepath or data
-#     filepath = session.get('last_uploaded_filepath') # Example, adjust based on your implementation
-
-#     # Perform prediction
-#     df = pd.read_csv(filepath,index_col=False)
-#     processed_data = process_data(df)
-#     prediction_result = predict_classes(processed_data)
-
-#     # Example usage
-#     folder_path = "Failure Mode Images"
-#     start_number = prediction_result  # Example start number
-
-#     # Fetch the first base64 encoded image that starts with the specified number
-#     encoded_image = get_images_from_folder(folder_path, start_number)
-#     return jsonify({'prediction_result': prediction_result,'plot_url3':encoded_image})
 @app.route('/predict', methods=['POST'])
 def predict():
     filepath = session.get('last_uploaded_filepath')
@@ -102,4 +85,4 @@ def predict():
         'shap_plot':url_for('static',filename=shap_plot)
     })
 if __name__ == '__main__':
-    app.run(host="0:0:0:0", port =5000)
+    app.run(debug=True)

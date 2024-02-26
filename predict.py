@@ -347,9 +347,9 @@ def get_df_vis(df_in,n):
 
 def visualize_df_vib(subset_df):
     plt.figure(figsize=(8, 6))
-    plt.plot(subset_df['Time'], subset_df['X-axis vibration displacement(um)'], label='X-axis', linestyle='-')
-    plt.plot(subset_df['Time'], subset_df['Y-axis vibration displacement(um)'], label='Y-axis', linestyle='--')
-    plt.plot(subset_df['Time'], subset_df['Z-axis vibration displacement(um)'], label='Z-axis', linestyle='-.')
+    plt.plot(subset_df['Time'], subset_df['X-axis vibration displacement(um)'], label='X-axis', linestyle='--',color='black')
+    plt.plot(subset_df['Time'], subset_df['Y-axis vibration displacement(um)'], label='Y-axis', linestyle='--',color='blue')
+    plt.plot(subset_df['Time'], subset_df['Z-axis vibration displacement(um)'], label='Z-axis', linestyle='-',color='red')
 
     # Adding fancy elements
     plt.title('Vibration Displacement along X, Y, and Z axes', fontsize=16)
@@ -368,9 +368,9 @@ def visualize_df_vib(subset_df):
     return plot_url
 def visualize_df_dis(df):
     plt.figure(figsize=(8, 6))
-    plt.plot(df['Time'],df['X-axis vibration speed(mm/s)'], label='X-axis', linestyle='-' )
-    plt.plot(df['Time'],df['Y-axis vibration speed(mm/s)'], label='Y-axis', linestyle='--')
-    plt.plot(df['Time'],df['Z-axis vibration speed(mm/s)'], label='Z-axis', linestyle='-.')
+    plt.plot(df['Time'],df['X-axis vibration speed(mm/s)'], label='X-axis', linestyle='--' ,color='black')
+    plt.plot(df['Time'],df['Y-axis vibration speed(mm/s)'], label='Y-axis', linestyle='--',color='blue')
+    plt.plot(df['Time'],df['Z-axis vibration speed(mm/s)'], label='Z-axis', linestyle='-',color='red')
 
     # Adding fancy elements
     plt.title('Vibration Speeds along X, Y, and Z axes', fontsize=16)
@@ -388,6 +388,27 @@ def visualize_df_dis(df):
     plot_url = base64.b64encode(img.getvalue()).decode()
     return plot_url
 
+def visualize_df_ang(df):
+    plt.figure(figsize=(8, 6))
+    plt.plot(df['X-axis angular vibration amplitude(°)'], label='X-axis', linestyle='--' ,color='black')
+    plt.plot(df['Y-axis angular vibration amplitude(°)'], label='Y-axis', linestyle='--',color='blue')
+    plt.plot(df['Z-axis angular vibration amplitude(°)'], label='Z-axis', linestyle='-',color='red')
+
+    # Adding fancy elements
+    plt.title('Vibration Speeds along X, Y, and Z axes', fontsize=16)
+    plt.xlabel('Measurement Number', fontsize=14)
+    plt.ylabel('Vibration Angular (°)', fontsize=14)
+    plt.legend(title='Axis', fontsize=12)
+    plt.grid(True, which='both', linestyle='--', linewidth=0.5)
+    plt.tight_layout()
+
+    # Saving the plot as a PNG file
+
+    img = io.BytesIO()
+    plt.savefig(img, format='png')
+    img.seek(0)
+    plot_url = base64.b64encode(img.getvalue()).decode()
+    return plot_url
 def encode_image_to_base64(image_path):
     """Encode image to base64."""
     with Image.open(image_path) as image:
